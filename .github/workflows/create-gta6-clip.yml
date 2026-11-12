@@ -13,7 +13,7 @@ on:
       start:
         description: Clip start (seconds)
         type: string
-        default: '20'
+        default: '50'
       duration:
         description: Clip duration (15-30 seconds)
         type: string
@@ -45,7 +45,7 @@ jobs:
         run: |
           set -euo pipefail
           URL="${INPUT_URL:-https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4}"
-          START="${INPUT_START:-20}"
+          START="${INPUT_START:-50}"
           DURATION="${INPUT_DURATION:-20}"
           export URL START DURATION
           python - <<'PY'
