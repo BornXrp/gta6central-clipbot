@@ -1,0 +1,37 @@
+name: Probe official GTA VI trailer file URLs
+on:
+  push:
+    paths:
+      - '.github/workflows/probe-gta-sources.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Identify Rockstar media filenames without downloading full trailers
+        shell: bash
+        run: |
+          python - <<'PY'
+          import urllib.request,re,html
+          headers={"User-Agent":"Mozilla/5.0","Referer":"https://www.rockstargames.com/","Origin":"https://www.rockstargames.com"}
+          base='https://media-rockstargames-com.akamaized.net/VI/downloads/videos'
+          pths=[]
+          for title in ['GTAVI_Trailer_2','GTAVI_Trailer_1','GTAVI_Trailer_2_1080p','GTAVI_Trailer_1_1080p','GTAVI_Pre_Load_Now','GTAVI_Pre-Load_Now','GTAVI_Preload_Now','GTAVI_PreLoad_Now','GTAVI_PreLoad','GTAVI_Pre_Load','GTAVI_Preload','GTAVI_Trailer2','GTAVI_Trailer1']:
+            pths.append(base+'/'+title+'/'+title+'.mp4')
+          for u in pths:
+            try:
+              req=urllib.request.Request(u,headers=headers,method="HEAD")
+              with urllib.request.urlopen(req,timeout=10) as r:
+                print("PROBE",r.status,r.headers.get('Content-Length'),r.headers.get('Content-Type'),u,flush=True)
+            except Exception as e:print("PROBE_FAIL",str(e)[:70],u,flush=True)
+          u="https://www.rockstargames.com/VI/media/videos"
+          try:
+            req=urllib.request.Request(u,headers={'User-Agent':'Mozilla/5.0'})
+            with urllib.request.urlopen(req,timeout=20) as r: page=r.read().decode('utf8','replace')
+            print("PAGE_LENGTH",len(page))
+            for m in list(re.finditer(r'(?:GTAVI[^"\\\\ ]{0,160}|\.mp4|Pre-Load Now|Trailer 2)',page,re.I))[:20]:
+              print("PAGE_FRAGMENT",page[max(0,m.start()-80):m.start()+160].replace('\\n',' ')[:260])
+          except Exception as e:print("PAGE_FETCH_FAIL",str(e))
+          PY
