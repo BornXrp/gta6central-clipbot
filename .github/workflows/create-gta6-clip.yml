@@ -9,11 +9,11 @@ on:
         description: Public video URL
         type: string
         required: true
-        default: https://samplefile.com/samples/download/video/mp4/mp4_30s_sample_file_1.7MB.mp4/
+        default: https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4
       start:
         description: Clip start (seconds)
         type: string
-        default: '0'
+        default: '20'
       duration:
         description: Clip duration (15-30 seconds)
         type: string
@@ -44,8 +44,8 @@ jobs:
           INPUT_DURATION: '${{ inputs.duration }}'
         run: |
           set -euo pipefail
-          URL="${INPUT_URL:-https://samplefile.com/samples/download/video/mp4/mp4_30s_sample_file_1.7MB.mp4/}"
-          START="${INPUT_START:-0}"
+          URL="${INPUT_URL:-https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4}"
+          START="${INPUT_START:-20}"
           DURATION="${INPUT_DURATION:-20}"
           export URL START DURATION
           python - <<'PY'
@@ -59,8 +59,10 @@ jobs:
           PY
           if [[ "$URL" == https://storage.googleapis.com/* || "$URL" == https://samplefile.com/samples/download/* || "$URL" == https://media-rockstargames-com.akamaized.net/* ]]; then
             echo "Retrieving downloadable MP4 directly (no YouTube player webpage)"
-            curl -fL --retry 2 --connect-timeout 15 --max-time 180 -o source.mp4 "$URL"
+            curl -fL --retry 2 --connect-timeout 15 --max-time 360 --max-redirs 5 -A 'Mozilla/5.0' -e 'https://www.rockstargames.com/' -H 'Origin: https://www.rockstargames.com' -o source.mp4 "$URL"
             file source.mp4
+  ls -lh source.mp4
+  ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 source.mp4
           else
             yt-dlp --no-playlist --js-runtimes node --merge-output-format mp4 -f 'bv*[height<=1080]+ba/b[height<=1080]/best' -o 'source.%(ext)s' "$URL"
           fi
@@ -82,6 +84,8 @@ jobs:
                      'note':'Metadata passed; full audio and visual review still required'},open('clip_report.json','w'),indent=2)
           print('Created',dur,'second video; NOT published')
           PY
+          mkdir -p preview
+          for SEC in 2 9 16; do ffmpeg -hide_banner -v error -y -ss "$SEC" -i gta6_post_ready.mp4 -frames:v 1 -vf 'scale=360:640' "preview/frame_${SEC}.jpg"; done
       - name: Save video for review (never posts automatically)
         if: always()
         uses: actions/upload-artifact@v4
@@ -90,5 +94,6 @@ jobs:
           path: |
             gta6_post_ready.mp4
             clip_report.json
+            preview/*.jpg
           retention-days: 7
           if-no-files-found: warn
