@@ -25,6 +25,8 @@ jobs:
             maxsec: 30
             stepsec: 3
     steps:
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: Make frames without downloading full 4K source
         shell: bash
         env:
