@@ -9,7 +9,7 @@ on:
         description: Public video URL
         type: string
         required: true
-        default: https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4
+        default: https://samplefile.com/samples/download/video/mp4/mp4_30s_sample_file_1.7MB.mp4/
       start:
         description: Clip start (seconds)
         type: string
@@ -17,7 +17,7 @@ on:
       duration:
         description: Clip duration (15-30 seconds)
         type: string
-        default: '15'
+        default: '20'
 permissions:
   contents: read
 jobs:
@@ -44,20 +44,20 @@ jobs:
           INPUT_DURATION: '${{ inputs.duration }}'
         run: |
           set -euo pipefail
-          URL="${INPUT_URL:-https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4}"
+          URL="${INPUT_URL:-https://samplefile.com/samples/download/video/mp4/mp4_30s_sample_file_1.7MB.mp4/}"
           START="${INPUT_START:-0}"
-          DURATION="${INPUT_DURATION:-15}"
+          DURATION="${INPUT_DURATION:-20}"
           export URL START DURATION
           python - <<'PY'
           import os,urllib.parse
           u=urllib.parse.urlparse(os.environ['URL'])
           host=(u.hostname or '').lower()
-          allowed=('youtube.com','youtu.be','tiktok.com','instagram.com','x.com','vimeo.com','rockstargames.com','storage.googleapis.com','media-rockstargames-com.akamaized.net')
+          allowed=('youtube.com','youtu.be','tiktok.com','instagram.com','x.com','vimeo.com','rockstargames.com','storage.googleapis.com','samplefile.com','media-rockstargames-com.akamaized.net')
           if u.scheme!='https' or not any(host==x or host.endswith('.'+x) for x in allowed): raise SystemExit('URL not allowed')
           s=float(os.environ['START']); d=float(os.environ['DURATION'])
           if s<0 or not 15<=d<=30: raise SystemExit('Clip must be 15-30 seconds')
           PY
-          if [[ "$URL" == https://storage.googleapis.com/* || "$URL" == https://media-rockstargames-com.akamaized.net/* ]]; then
+          if [[ "$URL" == https://storage.googleapis.com/* || "$URL" == https://samplefile.com/samples/download/* || "$URL" == https://media-rockstargames-com.akamaized.net/* ]]; then
             echo "Retrieving downloadable MP4 directly (no YouTube player webpage)"
             curl -fL --retry 2 --connect-timeout 15 --max-time 180 -o source.mp4 "$URL"
             file source.mp4
