@@ -1,0 +1,88 @@
+name: GTA6Central free video clip test
+on:
+  push:
+    paths:
+      - '.github/workflows/create-gta6-clip.yml'
+  workflow_dispatch:
+    inputs:
+      source_url:
+        description: Public video URL
+        type: string
+        required: true
+        default: https://www.youtube.com/watch?v=Bm7BLfTTrGo
+      start:
+        description: Clip start (seconds)
+        type: string
+        default: '0'
+      duration:
+        description: Clip duration (15-30 seconds)
+        type: string
+        default: '20'
+permissions:
+  contents: read
+jobs:
+  download-and-clip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install free downloader and editor
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -U 'yt-dlp[default]' yt-dlp-ejs
+      - name: Download and edit a real video
+        shell: bash
+        env:
+          INPUT_URL: '${{ inputs.source_url }}'
+          INPUT_START: '${{ inputs.start }}'
+          INPUT_DURATION: '${{ inputs.duration }}'
+        run: |
+          set -euo pipefail
+          URL="${INPUT_URL:-https://www.youtube.com/watch?v=Bm7BLfTTrGo}"
+          START="${INPUT_START:-0}"
+          DURATION="${INPUT_DURATION:-20}"
+          export URL START DURATION
+          python - <<'PY'
+          import os,urllib.parse
+          u=urllib.parse.urlparse(os.environ['URL'])
+          host=(u.hostname or '').lower()
+          allowed=('youtube.com','youtu.be','tiktok.com','instagram.com','x.com','vimeo.com','rockstargames.com')
+          if u.scheme!='https' or not any(host==x or host.endswith('.'+x) for x in allowed): raise SystemExit('URL not allowed')
+          s=float(os.environ['START']); d=float(os.environ['DURATION'])
+          if s<0 or not 15<=d<=30: raise SystemExit('Clip must be 15-30 seconds')
+          PY
+          yt-dlp --no-playlist --js-runtimes node --merge-output-format mp4 -f 'bv*[height<=1080]+ba/b[height<=1080]/best' -o 'source.%(ext)s' "$URL"
+          SOURCE="$(find . -maxdepth 1 -type f \( -name 'source.mp4' -o -name 'source.webm' -o -name 'source.mkv' \) | head -1)"
+          test -n "$SOURCE" || { echo 'No video file downloaded'; exit 1; }
+          ffmpeg -v error -y -ss "$START" -i "$SOURCE" -t "$DURATION" \
+            -vf 'scale=720:1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2:black,fps=30' \
+            -map 0:v:0 -map 0:a:0 -c:v libx264 -preset veryfast -crf 23 -pix_fmt yuv420p \
+            -c:a aac -b:a 128k -movflags +faststart gta6_post_ready.mp4
+          python - <<'PY'
+          import os,json,subprocess
+          p=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_type,width,height','-of','json','gta6_post_ready.mp4'],capture_output=True,text=True,check=True)
+          data=json.loads(p.stdout)
+          dur=float(data['format']['duration'])
+          assert 15<=dur<=30.75, f'Bad clip duration: {dur}'
+          assert any(s['codec_type']=='audio' for s in data['streams']), 'Audio missing'
+          assert any(s.get('width')==720 and s.get('height')==1280 for s in data['streams']), 'Portrait video missing'
+          json.dump({'source':os.environ['URL'],'duration_seconds':dur,'published':False,
+                     'note':'Metadata passed; full audio and visual review still required'},open('clip_report.json','w'),indent=2)
+          print('Created',dur,'second video; NOT published')
+          PY
+      - name: Save video for review (never posts automatically)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gta6-clip-and-report
+          path: |
+            gta6_post_ready.mp4
+            clip_report.json
+          retention-days: 7
+          if-no-files-found: warn
