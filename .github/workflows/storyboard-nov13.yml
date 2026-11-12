@@ -1,0 +1,49 @@
+name: GTA6Central trailer-wide storyboard
+on:
+  push:
+    paths: ['.github/workflows/storyboard-nov13.yml']
+permissions:
+  contents: read
+jobs:
+  frames:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: trailer1
+            url: https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_1/GTAVI_Trailer_1.mp4
+            maxsec: 90
+            stepsec: 9
+          - name: trailer2
+            url: https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_2/GTAVI_Trailer_2.mp4
+            maxsec: 167
+            stepsec: 12
+          - name: preload
+            url: https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Pre-Load_Now/GTAVI_Pre-Load_Now.mp4
+            maxsec: 30
+            stepsec: 3
+    steps:
+      - name: Make frames without downloading full 4K source
+        shell: bash
+        env:
+          SOURCE_URL: ${{ matrix.url }}
+          LIMIT: ${{ matrix.maxsec }}
+          STEP: ${{ matrix.stepsec }}
+        run: |
+          set -euo pipefail
+          mkdir -p storyboard
+          URL="${SOURCE_URL}"
+          HEADER=$'Referer: https://www.rockstargames.com/\r\nOrigin: https://www.rockstargames.com\r\nUser-Agent: Mozilla/5.0\r\n'
+          for (( SEC=0; SEC< LIMIT; SEC+=STEP )); do
+            ffmpeg -hide_banner -v error -y -ss "$SEC" -headers "$HEADER" -i "$URL" -frames:v 1 -vf 'scale=480:270' "storyboard/frame_$(printf '%03d' "$SEC").jpg" || true
+          done
+          ls -lh storyboard/
+      - name: Save source storyboard for manual clip selection
+        uses: actions/upload-artifact@v4
+        with:
+          name: gta6-nov13-source-${{ matrix.name }}
+          path: storyboard/
+          retention-days: 7
+          if-no-files-found: error
