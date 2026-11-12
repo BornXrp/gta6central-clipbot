@@ -61,8 +61,8 @@ jobs:
             echo "Retrieving downloadable MP4 directly (no YouTube player webpage)"
             curl -fL --retry 2 --connect-timeout 15 --max-time 360 --max-redirs 5 -A 'Mozilla/5.0' -e 'https://www.rockstargames.com/' -H 'Origin: https://www.rockstargames.com' -o source.mp4 "$URL"
             file source.mp4
-  ls -lh source.mp4
-  ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 source.mp4
+            ls -lh source.mp4
+            ffprobe -v error -show_entries format=duration,size -of default=noprint_wrappers=1 source.mp4
           else
             yt-dlp --no-playlist --js-runtimes node --merge-output-format mp4 -f 'bv*[height<=1080]+ba/b[height<=1080]/best' -o 'source.%(ext)s' "$URL"
           fi
