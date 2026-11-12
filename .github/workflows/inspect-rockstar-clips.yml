@@ -1,0 +1,47 @@
+name: Inspect Rockstar official character clips
+on:
+  push:
+    paths:
+      - '.github/workflows/inspect-rockstar-clips.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download official clip archive and inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg unzip
+          mkdir -p asset_inventory/previews clips
+          URL="https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Videos.zip"
+          curl --retry 2 -fL --max-time 420 -A 'Mozilla/5.0' -e 'https://www.rockstargames.com/' -o clips.zip "$URL"
+          ls -lh clips.zip
+          unzip -l clips.zip | tail -25
+          unzip -o -j -q clips.zip -d clips
+          python - <<'PY'
+          import os,glob,subprocess,json
+          out=[]
+          for idx,file in enumerate(sorted(glob.glob('clips/*'))):
+            print("CLIP",repr(file),os.stat(file).st_size)
+            p=subprocess.run(['ffprobe','-v','error','-show_entries','format=duration:stream=codec_type,width,height','-of','json',file],text=True,capture_output=True)
+            if p.returncode: continue
+            m=json.loads(p.stdout); d=float(m['format']['duration'])
+            out.append({'file':os.path.basename(file),'seconds':round(d,2),'bytes':os.stat(file).st_size,'streams':m['streams']})
+            at=max(0,min(2,d/2))
+            subprocess.run(['ffmpeg','-hide_banner','-v','error','-y','-ss',str(at),'-i',file,'-frames:v','1','-vf','scale=480:-2','asset_inventory/previews/preview_'+str(idx)+'.jpg'],check=False)
+          with open('asset_inventory/catalog.json','w') as f:json.dump(out,f,indent=2)
+          print('CATALOG',json.dumps(out))
+          PY
+      - name: Upload thumbnails and catalog only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-clip-catalog
+          path: asset_inventory/
+          retention-days: 7
+          if-no-files-found: warn
