@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-11-12",
+  "account": "@gta6central420",
+  "timezone": "America/New_York",
+  "policy": {
+    "rule": "Before each new post, compare all past published, approved/scheduled, pending, and rejected items against the new angle, footage and title. A change in caption alone does not make a repost unique.",
+    "checks": [
+      "unique topic_key",
+      "unique caption hook",
+      "source+time overlap with existing media",
+      "do not reuse exact same asset or slide concept",
+      "verify primary news dates and primary source",
+      "avoid prior NEEDS_WORK assets and near-duplicates"
+    ],
+    "copyright": "Only use material permitted to share and add accurate source attribution; editorial graphics are labeled, no fabricated gameplay.",
+    "text_position": "No added headline text over center gameplay; top safe area preferred.",
+    "publication": "PENDING_APPROVAL is not permission to post. Publish only after user approves exact previews."
+  },
+  "past_topics": [
+    {
+      "id": "bed65bd4",
+      "topic_key": "leonida-locations-3",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "b3eee47d",
+      "topic_key": "gta-vi-four-details",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "fdbdc16c",
+      "topic_key": "npc-eavesdropping",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "c9606493",
+      "topic_key": "five-world-features-airboats-kayaking-dirtbikes-influencers",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "472067c0",
+      "topic_key": "korean-rating-controversy",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "2668d45a",
+      "topic_key": "heists-and-robbery-opportunities",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "e59cf63e",
+      "topic_key": "onlyindade-realism-miami-street",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "8b5a1ccd",
+      "topic_key": "five-leonida-areas",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "6b919463",
+      "topic_key": "housing-safehouses-garages",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "af6fb624",
+      "topic_key": "fitness-gym-bodyweight",
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "b157b902",
+      "topic_key": "launch-trailer-action-biplane-motorcycle",
+      "status": "PUBLISHED",
+      "source_url": "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Launch_Trailer/GTAVI_Launch_Trailer.mp4",
+      "ranges": [
+        [
+          50,
+          66
+        ]
+      ]
+    },
+    {
+      "id": "32230ac8",
+      "topic_key": "wanted-system-police-clothing-recognition",
+      "status": "SCHEDULED_APPROVED"
+    },
+    {
+      "id": "cfe82b3b",
+      "topic_key": "preload-early-draft-needs-work",
+      "status": "NEEDS_WORK",
+      "flag": "Do not approve or duplicate asset"
+    },
+    {
+      "id": "d8c7655c",
+      "topic_key": "beach-clip-rejected",
+      "status": "NEEDS_WORK",
+      "flag": "Do not approve or duplicate asset"
+    }
+  ],
+  "planned_posts": [
+    {
+      "id": "dde47e50-0226-4598-bcf7-22f8dcf0d092",
+      "date": "2026-11-13",
+      "local_time": "09:00",
+      "status": "SCHEDULED_PENDING_APPROVAL",
+      "format": "IMAGE",
+      "topic_key": "xbox-one-cloud-gaming-native-vs-streaming-news",
+      "media_key": "image/773b043b-6680-47f0-b11a-b4280b8dcb48.png",
+      "source_url": "https://news.xbox.com/en-us/2026/11/10/grand-theft-auto-6-comes-to-xbox-cloud-gaming-november-19/"
+    },
+    {
+      "id": "98c240d6-423b-462b-947f-c4237fb4cc10",
+      "date": "2026-11-13",
+      "local_time": "11:00",
+      "status": "SCHEDULED_PENDING_APPROVAL",
+      "format": "VIDEO",
+      "topic_key": "nov10-official-preload-fresh-scenes",
+      "media_key": "video/2c08dfb4-dddb-48b8-ad96-f9b6b03dee3c.mp4",
+      "source_url": "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Pre-Load_Now/GTAVI_Pre-Load_Now.mp4",
+      "ranges": [
+        [
+          3,
+          6.1
+        ],
+        [
+          10.5,
+          23
+        ]
+      ]
+    },
+    {
+      "id": "3e8d66ef-8455-4579-980a-01c9c361ca4b",
+      "date": "2026-11-13",
+      "local_time": "13:00",
+      "status": "SCHEDULED_PENDING_APPROVAL",
+      "format": "SLIDESHOW_VIDEO",
+      "topic_key": "only-raw-records-boobie-drequan-real-dimez",
+      "media_key": "video/735a6d29-a602-4c6d-aaff-89ce60cd87a5.mp4",
+      "source_url": "https://www.rockstargames.com/VI/only-in-leonida"
+    },
+    {
+      "id": "34672d3a-df40-4006-a3de-dfebf0242606",
+      "date": "2026-11-13",
+      "local_time": "15:00",
+      "status": "SCHEDULED_PENDING_APPROVAL",
+      "format": "VIDEO",
+      "topic_key": "trailer1-leonida-viral-street-culture",
+      "media_key": "video/e94df37e-5968-477a-a3fc-144b53682c04.mp4",
+      "source_url": "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_1/GTAVI_Trailer_1.mp4",
+      "ranges": [
+        [
+          42,
+          62
+        ]
+      ]
+    },
+    {
+      "id": "55d1f2c1-54ea-4167-91ee-eaf73c1a677f",
+      "date": "2026-11-13",
+      "local_time": "17:00",
+      "status": "SCHEDULED_PENDING_APPROVAL",
+      "format": "SLIDESHOW_VIDEO",
+      "topic_key": "ultimate-edition-exclusive-gear-shops-95-cheetah",
+      "media_key": "video/713c14f2-f13d-4d09-bb28-d7ed9dd4261d.mp4",
+      "source_url": "https://news.xbox.com/en-us/2026/11/10/grand-theft-auto-6-comes-to-xbox-cloud-gaming-november-19/"
+    },
+    {
+      "id": "c94dd393-801b-4302-9ce1-c91b420a22f7",
+      "date": "2026-11-13",
+      "local_time": "19:00",
+      "status": "SCHEDULED_PENDING_APPROVAL",
+      "format": "VIDEO",
+      "topic_key": "trailer2-cinematic-police-raid-explosion",
+      "media_key": "video/ea55d8ab-a08a-4599-8534-134c497d6f10.mp4",
+      "source_url": "https://media-rockstargames-com.akamaized.net/VI/downloads/videos/GTAVI_Trailer_2/GTAVI_Trailer_2.mp4",
+      "ranges": [
+        [
+          102,
+          122
+        ]
+      ]
+    }
+  ]
+}
